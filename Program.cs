@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HouseholdNeedsManager.Data;
 using HouseholdNeedsManager.Models;
+using HouseholdNeedsManager.Services;
+using HouseholdNeedsManager.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +16,30 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Add session support for household context
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Register custom services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IHouseholdContextService, HouseholdContextService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Initialize database with roles
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbInitializer.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -33,7 +56,14 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// Add session middleware before authentication
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Add household context middleware
+app.UseMiddleware<HouseholdContextMiddleware>();
 
 app.MapStaticAssets();
 

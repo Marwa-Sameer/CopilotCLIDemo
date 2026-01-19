@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "Join Household";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Join" method="post">
+                        <div class="mb-3">
+                            <label for="householdId" class="form-label">Household ID</label>
+                            <input type="number" id="householdId" name="householdId" class="form-control" required 
+                                   placeholder="Enter the household ID" min="1" />
+                            <div class="form-text">
+                                Enter the ID of the household you want to join. You can get this ID from the household owner.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-info-circle"></i> How to Join a Household
+                            </h6>
+                            <ol class="mb-0">
+                                <li>Get the household ID from the household owner or administrator</li>
+                                <li>Enter the ID in the field above</li>
+                                <li>Click "Join Household" to become a member</li>
+                            </ol>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-shield-exclamation"></i> Note
+                            </h6>
+                            <p class="mb-0">
+                                You will be added as a regular member. The household owner can adjust your permissions later.
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Join Household
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-question-circle"></i> Don't have a household ID?
+                    </h5>
+                    <p class="card-text">
+                        If you don't have a household to join, you can create your own household instead.
+                    </p>
+                    <a asp-action="Create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Create New Household
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,172 @@
+@model IEnumerable<HouseholdNeedsManager.Models.HouseholdMember>
+
+@{
+    ViewData["Title"] = "My Households";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>@ViewData["Title"]</h1>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Create" class="btn btn-primary me-2">
+                <i class="bi bi-plus-circle"></i> Create Household
+            </a>
+            <a asp-action="Join" class="btn btn-outline-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Join Household
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No Households Yet</h4>
+            <p>You are not a member of any households. Create a new household or join an existing one to get started.</p>
+            <hr>
+            <div class="mb-0">
+                <a asp-action="Create" class="btn btn-primary me-2">Create Household</a>
+                <a asp-action="Join" class="btn btn-outline-primary">Join Household</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var membership in Model)
+            {
+                var isActive = ViewBag.ActiveHouseholdId != null && ViewBag.ActiveHouseholdId == membership.HouseholdId;
+                var household = membership.Household;
+                var isOwner = membership.Role == HouseholdNeedsManager.Models.HouseholdRole.Owner;
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 @(isActive ? "border-primary" : "")">
+                        <div class="card-header @(isActive ? "bg-primary text-white" : "bg-light")">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">@household?.Name</h5>
+                                @if (isActive)
+                                {
+                                    <span class="badge bg-light text-primary">Active</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-person"></i> Owner: @household?.Owner?.UserName
+                                </small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-people"></i> Members: @household?.Members.Count
+                                </small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-shield"></i> Your Role: 
+                                    <span class="badge @(isOwner ? "bg-warning" : membership.Role == HouseholdNeedsManager.Models.HouseholdRole.Admin ? "bg-info" : "bg-secondary")">
+                                        @membership.Role
+                                    </span>
+                                </small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> Joined: @membership.JoinedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                </small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            @if (!isActive)
+                            {
+                                <form asp-action="Switch" asp-route-id="@household?.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-check-circle"></i> Set Active
+                                    </button>
+                                </form>
+                            }
+                            
+                            @if (isOwner)
+                            {
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@household?.Id">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#leaveModal-@household?.Id">
+                                    <i class="bi bi-box-arrow-left"></i> Leave
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leave Modal -->
+                @if (!isOwner)
+                {
+                    <div class="modal fade" id="leaveModal-@household?.Id" tabindex="-1" aria-labelledby="leaveModalLabel-@household?.Id" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="leaveModalLabel-@household?.Id">Leave Household</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to leave the household <strong>@household?.Name</strong>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form asp-action="Leave" asp-route-id="@household?.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-warning">Leave Household</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Delete Modal -->
+                @if (isOwner)
+                {
+                    <div class="modal fade" id="deleteModal-@household?.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@household?.Id" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel-@household?.Id">Delete Household</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the household <strong>@household?.Name</strong>?</p>
+                                    <p class="text-danger"><strong>Warning:</strong> This will delete all items and categories associated with this household. This action cannot be undone.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form asp-action="Delete" asp-route-id="@household?.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger">Delete Household</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
