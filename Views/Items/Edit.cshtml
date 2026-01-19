@@ -1,0 +1,104 @@
+@model HouseholdNeedsManager.Models.Item
+
+@{
+    ViewData["Title"] = "Edit Item";
+    var categories = ViewBag.Categories as List<HouseholdNeedsManager.Models.Category> ?? new List<HouseholdNeedsManager.Models.Category>();
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="HouseholdId" />
+                <input type="hidden" asp-for="CreatedByUserId" />
+                <input type="hidden" asp-for="CreatedAt" />
+
+                <div class="mb-3">
+                    <label class="form-label">Item Type</label>
+                    <div class="form-text">
+                        @if (Model.HouseholdId.HasValue)
+                        {
+                            <span class="badge bg-primary">Household Item</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info">Personal Item</span>
+                        }
+                        <small class="text-muted">(Cannot change type after creation)</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Quantity" class="form-label"></label>
+                    <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsUrgent" class="form-check-input" />
+                    <label asp-for="IsUrgent" class="form-check-label"></label>
+                    <span asp-validation-for="IsUrgent" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EstimatedPrice" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="EstimatedPrice" class="form-control" type="number" step="0.01" min="0" />
+                    </div>
+                    <span asp-validation-for="EstimatedPrice" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label">Category</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">-- Select Category --</option>
+                        @foreach (var category in categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    @if (!categories.Any() && Model.HouseholdId.HasValue)
+                    {
+                        <small class="text-muted d-block mt-1">No categories available.</small>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Vendor" class="form-label"></label>
+                    <input asp-for="Vendor" class="form-control" />
+                    <span asp-validation-for="Vendor" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

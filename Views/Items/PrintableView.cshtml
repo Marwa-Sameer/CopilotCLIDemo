@@ -1,0 +1,217 @@
+@model IEnumerable<HouseholdNeedsManager.Models.Item>
+
+@{
+    ViewData["Title"] = "Shopping List";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .print-date {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .urgent {
+            background-color: #ffe6e6;
+        }
+
+        .urgent::before {
+            content: "⚠ ";
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #333;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .category-header {
+            background-color: #e9ecef;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #007bff;
+        }
+
+        .total-section {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+
+        .total-section h3 {
+            margin: 0 0 10px 0;
+        }
+
+        @@media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+            }
+        }
+
+        .print-button {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .print-button button {
+            padding: 10px 30px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .print-button button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print print-button">
+        <button onclick="window.print()">🖨️ Print this list</button>
+        <button onclick="window.close()" style="background-color: #6c757d;">Close</button>
+    </div>
+
+    <h1>Shopping List</h1>
+    <div class="print-date">
+        Generated on @DateTime.Now.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p style="text-align: center; color: #666;">No items to display.</p>
+    }
+    else
+    {
+        var urgentItems = Model.Where(i => i.IsUrgent).ToList();
+        var regularItems = Model.Where(i => !i.IsUrgent).ToList();
+
+        @if (urgentItems.Any())
+        {
+            <div class="category-header">⚠ URGENT ITEMS</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">☐</th>
+                        <th>Item</th>
+                        <th style="width: 80px;">Qty</th>
+                        <th style="width: 100px;">Price</th>
+                        <th>Category</th>
+                        <th>Vendor</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in urgentItems)
+                    {
+                        <tr class="urgent">
+                            <td><span class="checkbox"></span></td>
+                            <td><strong>@item.Name</strong></td>
+                            <td>@item.Quantity</td>
+                            <td>@(item.EstimatedPrice?.ToString("C") ?? "-")</td>
+                            <td>@(item.Category?.Name ?? "-")</td>
+                            <td>@(item.Vendor ?? "-")</td>
+                            <td>@(item.Notes ?? "")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (regularItems.Any())
+        {
+            <div class="category-header">Regular Items</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">☐</th>
+                        <th>Item</th>
+                        <th style="width: 80px;">Qty</th>
+                        <th style="width: 100px;">Price</th>
+                        <th>Category</th>
+                        <th>Vendor</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in regularItems)
+                    {
+                        <tr>
+                            <td><span class="checkbox"></span></td>
+                            <td>@item.Name</td>
+                            <td>@item.Quantity</td>
+                            <td>@(item.EstimatedPrice?.ToString("C") ?? "-")</td>
+                            <td>@(item.Category?.Name ?? "-")</td>
+                            <td>@(item.Vendor ?? "-")</td>
+                            <td>@(item.Notes ?? "")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="total-section">
+            <h3>Summary</h3>
+            <p><strong>Total Items:</strong> @Model.Count()</p>
+            <p><strong>Urgent Items:</strong> @urgentItems.Count</p>
+            @{
+                var totalEstimated = Model.Where(i => i.EstimatedPrice.HasValue).Sum(i => i.EstimatedPrice!.Value);
+                var itemsWithPrice = Model.Count(i => i.EstimatedPrice.HasValue);
+            }
+            @if (itemsWithPrice > 0)
+            {
+                <p><strong>Estimated Total:</strong> @totalEstimated.ToString("C") <small>(@itemsWithPrice items with prices)</small></p>
+            }
+        </div>
+    }
+</body>
+</html>
