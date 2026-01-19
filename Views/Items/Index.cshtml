@@ -1,0 +1,177 @@
+@model IEnumerable<HouseholdNeedsManager.Models.Item>
+
+@{
+    ViewData["Title"] = "Items";
+    var categories = ViewBag.Categories as List<HouseholdNeedsManager.Models.Category> ?? new List<HouseholdNeedsManager.Models.Category>();
+    var activeHouseholdId = ViewBag.ActiveHouseholdId as int?;
+    var currentFilter = ViewBag.CurrentFilter as string;
+    var currentCategoryId = ViewBag.CurrentCategoryId as int?;
+    var currentUrgent = ViewBag.CurrentUrgent as bool?;
+    var currentSearch = ViewBag.CurrentSearch as string;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Item
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filter Items</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">View</label>
+                        <select name="filter" class="form-select">
+                            <option value="" selected="@(currentFilter == null)">All Items</option>
+                            <option value="personal" selected="@(currentFilter == "personal")">My Items</option>
+                            @if (activeHouseholdId.HasValue)
+                            {
+                                <option value="household" selected="@(currentFilter == "household")">Household Items</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Category</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.Id" selected="@(currentCategoryId == category.Id)">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Urgency</label>
+                        <select name="urgent" class="form-select">
+                            <option value="">All Items</option>
+                            <option value="true" selected="@(currentUrgent == true)">Urgent Only</option>
+                            <option value="false" selected="@(currentUrgent == false)">Not Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="search" class="form-control" placeholder="Search by name..." value="@currentSearch" />
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a asp-action="Index" class="btn btn-secondary">Clear Filters</a>
+                    <a asp-action="ExportCsv" asp-route-filter="@currentFilter" asp-route-categoryId="@currentCategoryId" asp-route-urgent="@currentUrgent" asp-route-search="@currentSearch" class="btn btn-success">
+                        <i class="bi bi-download"></i> Export CSV
+                    </a>
+                    <a asp-action="PrintableView" asp-route-filter="@currentFilter" asp-route-categoryId="@currentCategoryId" asp-route-urgent="@currentUrgent" asp-route-search="@currentSearch" class="btn btn-info" target="_blank">
+                        <i class="bi bi-printer"></i> Print View
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No items found. <a asp-action="Create">Create your first item</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Urgent</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Vendor</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.IsUrgent)
+                                {
+                                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                }
+                                @item.Name
+                            </td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @if (item.IsUrgent)
+                                {
+                                    <span class="badge bg-danger">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.EstimatedPrice.HasValue)
+                                {
+                                    @item.EstimatedPrice.Value.ToString("C")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@(item.Category?.Name ?? "-")</td>
+                            <td>@(item.Vendor ?? "-")</td>
+                            <td>
+                                @if (item.HouseholdId.HasValue)
+                                {
+                                    <span class="badge bg-primary">Household</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info">Personal</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

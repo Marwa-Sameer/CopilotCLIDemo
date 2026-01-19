@@ -1,0 +1,109 @@
+@model HouseholdNeedsManager.Models.Item
+
+@{
+    ViewData["Title"] = "Create Item";
+    var categories = ViewBag.Categories as List<HouseholdNeedsManager.Models.Category> ?? new List<HouseholdNeedsManager.Models.Category>();
+    var activeHouseholdId = ViewBag.ActiveHouseholdId as int?;
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Item Type</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="HouseholdId" id="personalItem" value="" checked="@(!activeHouseholdId.HasValue || Model?.HouseholdId == null)" />
+                        <label class="form-check-label" for="personalItem">
+                            Personal Item
+                        </label>
+                    </div>
+                    @if (activeHouseholdId.HasValue)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="HouseholdId" id="householdItem" value="@activeHouseholdId.Value" checked="@(Model?.HouseholdId == activeHouseholdId.Value)" />
+                            <label class="form-check-label" for="householdItem">
+                                Household Item
+                            </label>
+                        </div>
+                    }
+                    <span asp-validation-for="HouseholdId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Quantity" class="form-label"></label>
+                    <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsUrgent" class="form-check-input" />
+                    <label asp-for="IsUrgent" class="form-check-label"></label>
+                    <span asp-validation-for="IsUrgent" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EstimatedPrice" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="EstimatedPrice" class="form-control" type="number" step="0.01" min="0" />
+                    </div>
+                    <span asp-validation-for="EstimatedPrice" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label">Category</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">-- Select Category --</option>
+                        @foreach (var category in categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    @if (!categories.Any() && activeHouseholdId.HasValue)
+                    {
+                        <small class="text-muted d-block mt-1">No categories available. Create categories in your household first.</small>
+                    }
+                    @if (!activeHouseholdId.HasValue)
+                    {
+                        <small class="text-muted d-block mt-1">Categories are only available for household items. Set an active household to use categories.</small>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Vendor" class="form-label"></label>
+                    <input asp-for="Vendor" class="form-control" />
+                    <span asp-validation-for="Vendor" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

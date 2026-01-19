@@ -1,0 +1,251 @@
+@model HouseholdNeedsManager.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">Dashboard</h1>
+
+    @if (Model.HasActiveHousehold)
+    {
+        <div class="alert alert-info">
+            <strong>Active Household:</strong> @Model.ActiveHouseholdName
+        </div>
+    }
+
+    <!-- Personal Statistics -->
+    <div class="mb-5">
+        <h2 class="mb-3">Personal Items</h2>
+        
+        @if (Model.PersonalStats != null && Model.PersonalStats.TotalItems > 0)
+        {
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Items</h5>
+                            <p class="card-text display-4">@Model.PersonalStats.TotalItems</p>
+                            <small>This Week</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-danger mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Urgent Items</h5>
+                            <p class="card-text display-4">@Model.PersonalStats.UrgentItems</p>
+                            <small>This Week</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Estimated Cost</h5>
+                            <p class="card-text display-4">$@Model.PersonalStats.TotalEstimatedCost.ToString("N2")</p>
+                            <small>This Week</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Categories</h5>
+                            <p class="card-text display-4">@Model.PersonalStats.ItemsByCategory.Count</p>
+                            <small>This Week</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Items by Category (This Week)</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="personalCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Weekly Trend</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="personalTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Historical Data (Last 4 Weeks)</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Week</th>
+                                <th>Total Items</th>
+                                <th>Urgent Items</th>
+                                <th>Estimated Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var week in Model.PersonalHistoricalStats)
+                            {
+                                <tr>
+                                    <td>@week.WeekLabel</td>
+                                    <td>@week.TotalItems</td>
+                                    <td>@week.UrgentItems</td>
+                                    <td>$@week.TotalEstimatedCost.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-secondary">
+                No personal items created this week.
+            </div>
+        }
+    </div>
+
+    <!-- Household Statistics -->
+    @if (Model.HasActiveHousehold)
+    {
+        <div class="mb-5">
+            <h2 class="mb-3">Household Items - @Model.ActiveHouseholdName</h2>
+            
+            @if (Model.HouseholdStats != null && Model.HouseholdStats.TotalItems > 0)
+            {
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Items</h5>
+                                <p class="card-text display-4">@Model.HouseholdStats.TotalItems</p>
+                                <small>This Week</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-danger mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Urgent Items</h5>
+                                <p class="card-text display-4">@Model.HouseholdStats.UrgentItems</p>
+                                <small>This Week</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Estimated Cost</h5>
+                                <p class="card-text display-4">$@Model.HouseholdStats.TotalEstimatedCost.ToString("N2")</p>
+                                <small>This Week</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Categories</h5>
+                                <p class="card-text display-4">@Model.HouseholdStats.ItemsByCategory.Count</p>
+                                <small>This Week</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Items by Category (This Week)</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="householdCategoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Weekly Trend</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="householdTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Historical Data (Last 4 Weeks)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Total Items</th>
+                                    <th>Urgent Items</th>
+                                    <th>Estimated Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var week in Model.HouseholdHistoricalStats)
+                                {
+                                    <tr>
+                                        <td>@week.WeekLabel</td>
+                                        <td>@week.TotalItems</td>
+                                        <td>@week.UrgentItems</td>
+                                        <td>$@week.TotalEstimatedCost.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-secondary">
+                    No household items created this week.
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="~/js/dashboard-charts.js"></script>
+    <script>
+        const dashboardData = {
+            personal: {
+                hasData: @Json.Serialize(Model.PersonalStats != null && Model.PersonalStats.TotalItems > 0),
+                categories: @Json.Serialize(Model.PersonalStats?.ItemsByCategory ?? new List<HouseholdNeedsManager.ViewModels.CategoryStats>()),
+                historical: @Json.Serialize(Model.PersonalHistoricalStats)
+            },
+            household: {
+                hasData: @Json.Serialize(Model.HouseholdStats != null && Model.HouseholdStats.TotalItems > 0),
+                categories: @Json.Serialize(Model.HouseholdStats?.ItemsByCategory ?? new List<HouseholdNeedsManager.ViewModels.CategoryStats>()),
+                historical: @Json.Serialize(Model.HouseholdHistoricalStats)
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboardCharts(dashboardData);
+        });
+    </script>
+}

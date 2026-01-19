@@ -1,0 +1,179 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  border-left: 4px solid #0d6efd;
+  transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dashboard-card.urgent {
+  border-left-color: #dc3545;
+}
+
+.dashboard-card.cost {
+  border-left-color: #198754;
+}
+
+.dashboard-card .card-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Chart Containers */
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-top: 20px;
+}
+
+/* Household Switcher */
+.household-switcher .dropdown-toggle {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  color: #495057;
+}
+
+.household-switcher .dropdown-toggle:hover {
+  background-color: #dee2e6;
+}
+
+.household-switcher .dropdown-item.active-household {
+  background-color: #e7f3ff;
+  font-weight: 600;
+}
+
+/* Item Filters */
+.item-filters {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1.5rem;
+}
+
+.item-filters .form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Urgent Badge */
+.urgent-badge {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.urgent-item {
+  border-left: 3px solid #dc3545;
+}
+
+/* Household Card */
+.household-card {
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
+}
+
+.household-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.household-card.active-household {
+  border-color: #0d6efd;
+  border-width: 2px;
+  background-color: #f0f8ff;
+}
+
+.household-card .badge {
+  font-size: 0.875rem;
+}
+
+/* Printable View */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .printable-list {
+    font-size: 14pt;
+  }
+  
+  .printable-list .urgent-item {
+    font-weight: bold;
+  }
+}
+
+/* Form Styles */
+.form-section {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+}
+
+.form-section h4 {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+/* Alert Customizations */
+.alert-household {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+/* Table Styles */
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+  margin-bottom: 0.5rem;
+}

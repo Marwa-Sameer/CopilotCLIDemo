@@ -1,0 +1,17 @@
+{
+  "name": "household-needs-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Household Needs Manager",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report"
+  },
+  "keywords": ["playwright", "e2e", "testing"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

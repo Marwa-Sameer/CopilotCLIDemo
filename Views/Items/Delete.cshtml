@@ -1,0 +1,95 @@
+@model HouseholdNeedsManager.Models.Item
+
+@{
+    ViewData["Title"] = "Delete Item";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <div class="alert alert-warning">
+        <h4>Are you sure you want to delete this item?</h4>
+        <p>This action cannot be undone.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Item Details</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Quantity</dt>
+                <dd class="col-sm-9">@Model.Quantity</dd>
+
+                <dt class="col-sm-3">Urgent</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsUrgent)
+                    {
+                        <span class="badge bg-danger">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Estimated Price</dt>
+                <dd class="col-sm-9">
+                    @if (Model.EstimatedPrice.HasValue)
+                    {
+                        @Model.EstimatedPrice.Value.ToString("C")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not specified</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">@(Model.Category?.Name ?? "None")</dd>
+
+                <dt class="col-sm-3">Vendor</dt>
+                <dd class="col-sm-9">@(Model.Vendor ?? "Not specified")</dd>
+
+                <dt class="col-sm-3">Notes</dt>
+                <dd class="col-sm-9">@(Model.Notes ?? "No notes")</dd>
+
+                <dt class="col-sm-3">Type</dt>
+                <dd class="col-sm-9">
+                    @if (Model.HouseholdId.HasValue)
+                    {
+                        <span class="badge bg-primary">Household</span>
+                        @if (Model.Household != null)
+                        {
+                            <span> - @Model.Household.Name</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge bg-info">Personal</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Created By</dt>
+                <dd class="col-sm-9">@(Model.CreatedBy?.UserName ?? "Unknown")</dd>
+
+                <dt class="col-sm-3">Created At</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("g")</dd>
+
+                <dt class="col-sm-3">Last Updated</dt>
+                <dd class="col-sm-9">@Model.UpdatedAt.ToLocalTime().ToString("g")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
