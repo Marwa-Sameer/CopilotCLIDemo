@@ -41,9 +41,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
 
-    - name: Install EF Core tools
-      run: dotnet tool install --global dotnet-ef
-
     - name: Update connection string for CI
       run: |
         sed -i 's|(localdb)\\\\mssqllocaldb|localhost,1433|g' appsettings.json
@@ -51,9 +48,7 @@ jobs:
         echo "Updated connection string:"
         grep "DefaultConnection" appsettings.json
 
-    - name: Run EF Core migrations
-      run: dotnet ef database update --project HouseholdNeedsManager.csproj --startup-project HouseholdNeedsManager.csproj --verbose
-
+    # Note: EF Core migrations run automatically when the application starts (see Program.cs)
     - name: Run application in background
       run: |
         dotnet run --no-build --configuration Release &
