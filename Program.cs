@@ -34,11 +34,23 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Initialize database with roles
+// Initialize database with migrations and roles
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await DbInitializer.Initialize(services);
+    try
+    {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        // Apply pending migrations automatically
+        dbContext.Database.Migrate();
+        // Initialize roles
+        await DbInitializer.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+    }
 }
 
 // Configure the HTTP request pipeline.
