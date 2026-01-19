@@ -1,13 +1,14 @@
 # CopilotCLIDemo
 
 ## Main idea
-This is a simple project to add, update, delete, and view household needs so they can be ordered later. The backend is built with .NET 10 and C#, the frontend uses ASP.NET MVC with HTML, CSS, and JavaScript, and Microsoft SQL Server is used for the database.
+This project is a multi-user household needs manager that allows users to add, update, delete, and view household items so they can be ordered later. It supports individual accounts with roles, categorization of items, and exportable shopping lists.
 
 ## Technologies
 - Backend:
   - .NET 10
   - C#
 - Frontend (MVC):
+  - ASP.NET MVC (server-rendered Razor views)
   - HTML
   - CSS
   - JavaScript
@@ -17,73 +18,73 @@ This is a simple project to add, update, delete, and view household needs so the
 ---
 
 ## Preview of current README
-The current README contains a short description of the project's idea and lists the core technologies (backend, frontend, database). It can be expanded with more detail about features, setup, usage, data model, deployment, testing, and contribution guidelines.
+The README describes the project's main idea and core technologies. It now includes a short interview summary (below) that captures the project's intended scope and configuration based on the maintainer's answers.
 
 ---
 
-## Interview (multiple-choice)
-Please answer each question by selecting exactly one option (A, B, C, or D). If you choose D (Other), briefly describe the details on the line after the question.
+## Interview answers (maintainer)
+1) Primary goal: A) Simple personal household list (CRUD) to track needs and order manually, expanded to support multiple users and roles (selected: A)
+2) Primary users: C) Multiple users with individual accounts and roles (selected: C)
+3) Authentication/authorization: C) Individual accounts with registration, login, and roles (selected: C)
+4) Data fields for each item (selected: D):
+   - Name
+   - Quantity
+   - Urgent flag
+   - Estimated price
+   - Category
+   - Vendor / Store
+   - Notes
 
-1) What is the primary goal of this project?
-- A) Simple personal household list (CRUD) to track needs and order manually.
-- B) Inventory + shopping list with pricing and budgeting features.
-- C) Multi-user shared household lists with permissions and history.
-- D) Other (please specify):
-
-2) Who are the primary users?
-- A) Single individual managing their own household.
-- B) Multiple household members sharing a single account.
-- C) Multiple users with individual accounts and roles (owner/admin/member).
-- D) Other (please specify):
-
-3) What level of authentication/authorization do you want?
-- A) No authentication (open to anyone).
-- B) Basic authentication (single shared password or PIN).
-- C) Individual accounts with registration, login, and roles.
-- D) OAuth/social login (Google, Microsoft, etc.).
-
-4) What data fields should each "need"/item include?
-- A) Name, quantity, and an urgent flag.
-- B) Name, quantity, estimated price, vendor/store.
-- C) Name, quantity, category, notes, optional image.
-- D) Other (please specify):
-
-5) How should ordering be handled?
-- A) No ordering — generate lists to order manually.
-- B) Export lists to CSV/printable formats.
-- C) Integrate with an online store or ordering API.
-- D) Generate shopping routes or grouped orders for efficiency.
-
-6) What user interface do you prefer?
-- A) Traditional server-rendered MVC pages and forms (current approach).
-- B) Single-page app (React/Vue) for a richer UX.
-- C) Mobile-first responsive site with progressive enhancement.
-- D) Command-line or desktop client.
-
-7) Which database/deployment environment do you plan to use for production?
-- A) Microsoft SQL Server (on-premises or VM).
-- B) Azure SQL / managed cloud DB.
-- C) SQLite or local DB for simple deployments/testing.
-- D) Other (please specify):
-
-8) How should we deploy this app?
-- A) Run locally / IIS on Windows Server.
-- B) Docker containers.
-- C) Azure App Service or similar PaaS.
-- D) Other (please specify):
-
-9) What level of automated testing is required?
-- A) No automated tests for now.
-- B) Unit tests for backend logic and models.
-- C) Integration tests covering data access and controllers.
-- D) End-to-end tests (UI) as well.
-
-10) License and contribution model
-- A) MIT License — open to public contributions.
-- B) Apache-2.0 — open to public contributions.
-- C) Proprietary / private repo — no external contributions.
-- D) Other (please specify):
+5) Ordering: B) Export lists to CSV/printable formats (selected: B)
+6) UI preference: A) Traditional server-rendered MVC pages and forms (selected: A)
+7) Production database: A) Microsoft SQL Server (selected: A)
+8) Deployment method: A) Run locally / IIS on Windows Server (selected: A)
+9) Automated testing level: D) End-to-end tests (UI) as well (selected: D)
+10) License & contribution model: A) MIT License — open to public contributions (selected: A)
 
 ---
 
-After you answer these questions, I will update the README to include your selected options as a project configuration summary and optionally add setup and usage instructions tailored to your answers. If you'd like, I can also create issues or a project board to track features based on your responses.
+## Project configuration summary
+From the answers above, here is the intended scope and recommended initial plan:
+
+- Architecture
+  - ASP.NET MVC server-rendered application.
+  - .NET 10 backend with controllers and Razor views.
+  - Microsoft SQL Server for persistent storage.
+  - Authentication with individual user accounts, role-based authorization (e.g., Owner/Admin/Member).
+
+- Core data model (Item / Need)
+  - Id (int, PK)
+  - Name (string, required)
+  - Quantity (int)
+  - IsUrgent (bool)
+  - EstimatedPrice (decimal, optional)
+  - Category (string or FK to Category table)
+  - Vendor (string)
+  - Notes (string / nvarchar(max))
+  - CreatedByUserId (FK to Users)
+  - CreatedAt, UpdatedAt (timestamps)
+
+- Features to implement first
+  1. User registration, login, and role management.
+  2. CRUD for items (server-rendered MVC views and forms).
+  3. Export shopping lists to CSV and a printable view.
+  4. Basic UI to mark items as urgent and filter/sort by category, vendor or urgency.
+  5. End-to-end tests for critical flows (register/login, create/edit/delete item, export list).
+  6. Deployment instructions for IIS + SQL Server.
+
+- Non-functional
+  - Licensing: MIT (open to contributions).
+  - Local development: SQL Server Express or Dockerized SQL Server for parity with production.
+  - CI: Add a pipeline that runs unit and end-to-end tests before merges.
+
+---
+
+## Next steps I can help with (pick any)
+- Scaffold the data model and EF Core migrations for the Item entity and Categories.
+- Add authentication (ASP.NET Identity) and role scaffolding.
+- Create the initial MVC controllers and Razor views for item CRUD and list export.
+- Add end-to-end tests (Playwright) for the main user flows.
+- Add deployment instructions for IIS and SQL Server, or Docker compose if you prefer.
+
+If you tell me which of the next steps you want first, I'll implement it (create files, scaffold code, or open issues) and update the README with more detailed setup and usage instructions.
